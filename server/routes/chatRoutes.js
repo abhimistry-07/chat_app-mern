@@ -121,13 +121,42 @@ chatRoute.put('/rename', async (req, res) => {
     }
 });
 
-chatRoute.put('/removefrgrp', (req, res) => {
+chatRoute.put('/addtogrp', async (req, res) => {
+    const { chatId, userId } = req.body;
 
+    const added = await chatModel.findByIdAndUpdate(chatId, {
+        $push: { users: userId },
+    },
+        { new: true }
+    )
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
+
+    if (!added) {
+        res.status(404).send({ msg: "Chat not found!" });
+    } else {
+        res.status(200).json(added);
+    }
 });
 
-chatRoute.put('/addtogrp', (req, res) => {
+chatRoute.put('/removefrgrp', async (req, res) => {
+    const { chatId, userId } = req.body;
 
+    const removed = await chatModel.findByIdAndUpdate(chatId, {
+        $pull: { users: userId },
+    },
+        { new: true }
+    )
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
+
+    if (!removed) {
+        res.status(404).send({ msg: "Chat not found!" });
+    } else {
+        res.status(200).json(removed);
+    }
 });
+
 
 
 module.exports = chatRoute;

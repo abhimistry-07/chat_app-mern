@@ -1,13 +1,14 @@
 const express = require('express');
-
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const generateToken = require('../config/generateToken');
+const authenticate = require('../middlewares/authMiddleware')
+
 
 const userRoute = express.Router();
 
 userRoute.post('/register', async (req, res) => {
-    const { name, email, password, image, isAdmin } = req.body;
+    const { name, email, password, pic, isAdmin } = req.body;
 
     try {
 
@@ -63,7 +64,7 @@ userRoute.post('/login', async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
-                image: user.image,
+                pic: user.pic,
                 token
             })
         } else {
@@ -72,6 +73,23 @@ userRoute.post('/login', async (req, res) => {
     } catch (error) {
         res.status(401).send({ msg: 'Error logingin', error })
     }
+});
+
+userRoute.get('/allUsers', authenticate, async (req, res) => {
+    const keyWord = req.query.search ? {
+        $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+        ]
+    } : {};
+
+    const users = await userModel.find(keyWord)
+    .find({
+        _id: { $ne: req.user._id }
+    });
+
+    res.status(200).send(users);
+    // console.log(keyWord);
 });
 
 module.exports = userRoute;

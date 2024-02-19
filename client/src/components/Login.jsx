@@ -12,19 +12,39 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { login, logout } from "../redux/authReducer/action";
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
 function Login() {
-  const navigate = useNavigate();
-  const { toggleColorMode } = useColorMode();
-  const formBackground = useColorModeValue("gray.100", "gray.700");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { toggleColorMode } = useColorMode();
+  const formBackground = useColorModeValue("gray.100", "gray.700");
   const toast = useToast();
+
+  const dispatch = useDispatch();
+  const auth = useSelector((store) => store.authReducer.isAuth);
+  const user = useSelector((store) => store.authReducer.user);
+
+  const location = useLocation();
+  const isLogedIn = JSON.parse(localStorage.getItem("userInfo"));
+  if (isLogedIn) {
+    return <Navigate state={location.pathname} to={"/chats"} replace={true} />;
+  }
+
+  console.log(auth, user, ">>>>>>>>/////////");
+
+  // const handleLogOut = () => {
+  //   localStorage.removeItem("userInfo");
+
+  //   dispatch(logout());
+  // };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -32,7 +52,6 @@ function Login() {
     if (!email || !password) {
       toast({
         title: "Please fill all the fields!",
-        // description: "We've created your account for you.",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -42,40 +61,50 @@ function Login() {
       return;
     }
 
-    try {
-      await axios.post(`${BASEURL}/user/login`, {
+    await axios
+      .post(`${BASEURL}/user/login`, {
         email,
         password,
-      });
+      })
+      .then((res) => {
+        console.log(res.data, ">>>>>>");
 
-      // console.log(data,'>>>>>>>>.');
+        // const userData = {
+        //   email,
+        //   password,
+        // };
 
-      toast({
-        title: "Login Successfull!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+        dispatch(login(res.data));
 
-      localStorage.setItem("userInfo", JSON.stringify({ email, password }));
-      setLoading(false);
-      navigate("/chats");
-    } catch (error) {
-      toast({
-        title: error?.response?.data?.msg,
-        status: "info",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
+        toast({
+          title: "Login Successfull!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+
+        localStorage.setItem("userInfo", JSON.stringify({ email, password }));
+        setLoading(false);
+        navigate("/chats");
+      })
+      .catch((error) => {
+        // console.log(error?.response.data.msg, ">>>>>>>");
+        toast({
+          title: error?.response?.data?.msg,
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        console.log(error, "Error login in handleLogin fun");
+        setLoading(false);
       });
-      console.log(error, "Error login in handleLogin fun");
-      setLoading(false);
-    }
   };
 
   return (
     <Flex h="100vh" alignItems="center" justifyContent="center">
+      {/* <Button onClick={handleLogOut}>Log Out</Button> */}
       <Flex
         flexDirection="column"
         // bg={formBackground}

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import SearchSection from "../components/SearchSection";
 import MyChats from "../components/MyChats";
-import ChatBox from "./ChatBox";
+import ChatBox from "../components/ChatBox";
 
 function ChatPage() {
   const user = useSelector((store) => store.authReducer.user);

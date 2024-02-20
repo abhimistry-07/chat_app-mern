@@ -16,6 +16,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
   Tooltip,
   useDisclosure,
@@ -30,6 +31,7 @@ import ProfileModal from "./ProfileModal";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserList from "./UserList";
+import { getAllChat, selectedChatFun } from "../redux/chatReducer/action";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
@@ -37,15 +39,19 @@ function SearchSection() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingChat, setLoadingChat] = useState([]);
+  const [loadingChat, setLoadingChat] = useState(false);
+  // const [selectedChat, setSelectedChat] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.authReducer.user);
+  const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
+  const allChats = useSelector((store) => store.chatReducer.allChat);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  // console.log(user, "In search section");
+
+  // console.log(selectedChat, "In search section selectedChat");
 
   const handleLogOut = () => {
     localStorage.removeItem("userInfo");
@@ -86,7 +92,7 @@ function SearchSection() {
     } catch (error) {
       console.log(error);
       toast({
-        title: "Error",
+        title: "Error searching users!",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -96,9 +102,41 @@ function SearchSection() {
     }
   };
 
-  const accessChat = () => {};
+  const accessChat = async (userId) => {
+    try {
+      setLoadingChat(true);
 
-  console.log(searchResult, ">>>.");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post(`${BASEURL}/chat`, { userId }, config);
+
+      if (!allChats.find((chat) => chat._id === data._id)) {
+        dispatch(getAllChat([data, ...allChats]));
+      }
+
+      setLoadingChat(false);
+      dispatch(selectedChatFun(data));
+      onClose();
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error fetching chat!",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
+  // console.log(searchResult, ">>>.");
 
   return (
     <>
@@ -159,7 +197,7 @@ function SearchSection() {
           <DrawerCloseButton />
           <DrawerHeader>Search Users</DrawerHeader>
           <DrawerBody>
-            <Flex gap="2" mb='4'>
+            <Flex gap="2" mb="4">
               <Input
                 variant="flushed"
                 placeholder="Search here..."
@@ -180,6 +218,7 @@ function SearchSection() {
                 />
               ))
             )}
+            {loadingChat && <Spinner ml="auto" />}
           </DrawerBody>
           <DrawerFooter>
             <Button variant="outline" mr={3} onClick={onClose}>

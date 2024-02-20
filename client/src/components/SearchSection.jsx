@@ -2,6 +2,15 @@ import {
   Avatar,
   Box,
   Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  Input,
   Menu,
   MenuButton,
   MenuDivider,
@@ -9,6 +18,8 @@ import {
   MenuList,
   Text,
   Tooltip,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { BellIcon, ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
@@ -16,6 +27,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/authReducer/action";
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "./ProfileModal";
+import axios from "axios";
+import ChatLoading from "./ChatLoading";
+import UserList from "./UserList";
+
+const BASEURL = process.env.REACT_APP_BASE_URL;
 
 function SearchSection() {
   const [search, setSearch] = useState("");
@@ -27,6 +43,8 @@ function SearchSection() {
   const navigate = useNavigate();
   const user = useSelector((store) => store.authReducer.user);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
   // console.log(user, "In search section");
 
   const handleLogOut = () => {
@@ -36,6 +54,51 @@ function SearchSection() {
 
     navigate("/");
   };
+
+  const handleSearch = async () => {
+    if (!search) {
+      toast({
+        title: "Please enter something in search",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top-left",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.get(
+        `${BASEURL}/user/allUsers?search=${search}`,
+        config
+      );
+
+      setLoading(false);
+      setSearchResult(data);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
+  const accessChat = () => {};
+
+  console.log(searchResult, ">>>.");
 
   return (
     <>
@@ -49,7 +112,7 @@ function SearchSection() {
         bg="#E1E2F6"
       >
         {/* <Tooltip hasArrow label="Search places" bg="gray.300" color="black"> */}
-        <Button>
+        <Button onClick={onOpen}>
           <SearchIcon />
           <Text display={["none", "flex"]} px="4">
             Search User
@@ -88,6 +151,43 @@ function SearchSection() {
           </Menu>
         </Box>
       </Box>
+
+      {/* Drawer sectio */}
+      <Drawer placement="left" isOpen={isOpen} onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Search Users</DrawerHeader>
+          <DrawerBody>
+            <Flex gap="2" mb='4'>
+              <Input
+                variant="flushed"
+                placeholder="Search here..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button onClick={handleSearch}>Go</Button>
+            </Flex>
+
+            {loading ? (
+              <ChatLoading />
+            ) : (
+              searchResult?.map((user) => (
+                <UserList
+                  key={user._id}
+                  user={user}
+                  handleFunction={() => accessChat(user._id)}
+                />
+              ))
+            )}
+          </DrawerBody>
+          <DrawerFooter>
+            <Button variant="outline" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }

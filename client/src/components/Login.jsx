@@ -22,6 +22,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState([]);
 
   const navigate = useNavigate();
   const { toggleColorMode } = useColorMode();
@@ -67,12 +68,12 @@ function Login() {
         password,
       })
       .then((res) => {
-        console.log(res.data, ">>>>>>");
+        // console.log(res.data, ">>>>>>");
 
-        // const userData = {
-        //   email,
-        //   password,
-        // };
+        const userData = {
+          email,
+          password,
+        };
 
         dispatch(login(res.data));
 
@@ -84,7 +85,7 @@ function Login() {
           position: "bottom",
         });
 
-        localStorage.setItem("userInfo", JSON.stringify({ email, password }));
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
         setLoading(false);
         navigate("/chats");
       })

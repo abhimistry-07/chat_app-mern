@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import SignUp from "../components/SignUp";
 import PrivateRoute from "./PrivateRoute";
+import ChatPage from "../pages/ChatPage";
 
 function AllRoutes() {
   return (
@@ -13,7 +14,7 @@ function AllRoutes() {
         path="/chats"
         element={
           <PrivateRoute>
-            <h1>Chats Page</h1>
+            <ChatPage />
           </PrivateRoute>
         }
       />

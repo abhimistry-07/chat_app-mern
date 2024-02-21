@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
@@ -9,12 +9,12 @@ import ChatBox from "../components/ChatBox";
 function ChatPage() {
   const user = useSelector((store) => store.authReducer.user);
 
-  console.log(user,'ChatPage');
+  // console.log(user, "ChatPage");
 
   return (
     <Box w="100%">
       {user && <SearchSection />}
-      <Flex justifyContent="space-between" h="100vh" p="10px">
+      <Flex justifyContent="space-between" h="100vh" p="10px" gap="2">
         {user && <MyChats />}
         {user && <ChatBox />}
       </Flex>

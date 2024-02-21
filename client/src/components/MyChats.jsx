@@ -15,6 +15,7 @@ function MyChats() {
   const user = useSelector((store) => store.authReducer.user);
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
   const allChats = useSelector((store) => store.chatReducer.allChat);
+  const fetchAgain = useSelector((store) => store.chatReducer.fetchAgain);
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -52,18 +53,21 @@ function MyChats() {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
-  console.log(selectedChat);
+  console.log(selectedChat, "selectedChat in My Chat comp");
 
   return (
     <Box
-      border="1px solid red"
+      boxShadow="md"
+      // rounded="md"
+      // bg="white"
+      // border="1px solid red"
       display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
       flexDir="column"
       alignItems="center"
       p="3"
-      w={["100%", "30%"]}
+      w={{ base: "100%", md: "30%" }}
       borderRadius="lg"
       borderWidth="1px"
     >
@@ -71,7 +75,15 @@ function MyChats() {
         <Text as="b">My Chats</Text>
         <CreateGroupModal>
           <Button size="sm">
-            New Group Chat
+            <Text
+              display={{
+                base: "flex",
+                md: selectedChat ? "none" : "flex",
+                lg: "flex",
+              }}
+            >
+              Create Group
+            </Text>
             <AddIcon boxSize={3} ml="2" />
           </Button>
         </CreateGroupModal>

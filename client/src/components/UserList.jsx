@@ -14,6 +14,9 @@ function UserList({ user, handleFunction }) {
       mb="2"
       borderRadius="lg"
       bg="#E8E8E8"
+      _hover={{
+        backgroundColor: "#bbbdd9",
+      }}
     >
       <Avatar mr="2" size="sm" name={user.name} src={user.pic} />
       <Box>

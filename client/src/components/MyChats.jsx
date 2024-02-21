@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllChat, selectedChatFun } from "../redux/chatReducer/action";
 import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from "./ChatLoading";
+import CreateGroupModal from "./CreateGroupModal";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
@@ -43,7 +44,7 @@ function MyChats() {
   };
 
   const getSender = (loggedUser, users) => {
-    return users[0]._id === loggedUser._id ? users[1].name : users[0].name;
+    return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
   };
 
   const handleSelectChat = (chat) => {};
@@ -68,10 +69,12 @@ function MyChats() {
     >
       <Flex w="100%" justifyContent="space-between" alignItems="center" mb="5">
         <Text as="b">My Chats</Text>
-        <Button size="sm">
-          New Group Chat
-          <AddIcon boxSize={3} ml="2" />
-        </Button>
+        <CreateGroupModal>
+          <Button size="sm">
+            New Group Chat
+            <AddIcon boxSize={3} ml="2" />
+          </Button>
+        </CreateGroupModal>
       </Flex>
 
       <Flex
@@ -94,7 +97,7 @@ function MyChats() {
                 px="3"
                 py="2"
                 borderRadius="lg"
-                key={chat._id}
+                key={chat?._id}
                 mt="2"
               >
                 <Text>

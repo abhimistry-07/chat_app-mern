@@ -7,7 +7,8 @@ const notFoundMiddleware = require('./middlewares/notFoundMiddleware')
 const cors = require('cors');
 const userRoute = require('./routes/userRoutes')
 const chatRoute = require('./routes/chatRoutes');
-const authenticate = require('./middlewares/authMiddleware')
+const authenticate = require('./middlewares/authMiddleware');
+const messageRoute = require('./routes/messageRoutes');
 
 
 // To accept JSON data
@@ -21,6 +22,8 @@ app.get('/', (req, res) => {
 app.use('/user', userRoute);
 
 app.use('/chat', authenticate, chatRoute);
+
+app.use('/message', authenticate, messageRoute);
 
 app.use(notFoundMiddleware);
 

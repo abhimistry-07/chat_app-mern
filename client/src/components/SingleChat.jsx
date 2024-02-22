@@ -7,6 +7,7 @@ import {
 import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, HamburgerIcon, ViewIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
+import UpdateGroupModal from "./UpdateGroupModal";
 
 function SingleChat() {
   const user = useSelector((store) => store.authReducer.user);
@@ -52,16 +53,23 @@ function SingleChat() {
               //   alignItems="center"
             >
               {selectedChat && selectedChat.isGroupChat ? (
-                selectedChat.chatName
+                <>{selectedChat.chatName}</>
               ) : (
-                <Text>{getSenderName(user, selectedChat.users)}</Text>
+                <>{getSenderName(user, selectedChat.users)}</>
               )}
             </Text>
+
             <ProfileModal user={getSenderDetails(user, selectedChat.users)}>
               <IconButton display={selectedChat.isGroupChat ? "none" : "flex"}>
                 <ViewIcon />
               </IconButton>
             </ProfileModal>
+
+            <UpdateGroupModal>
+              <IconButton display={selectedChat.isGroupChat ? "flex" : "none"}>
+                <ViewIcon />
+              </IconButton>
+            </UpdateGroupModal>
           </Box>
           <Box
             // border="1px solid blue"

@@ -59,17 +59,21 @@ function SingleChat() {
               )}
             </Text>
 
-            <ProfileModal user={getSenderDetails(user, selectedChat.users)}>
-              <IconButton display={selectedChat.isGroupChat ? "none" : "flex"}>
-                <ViewIcon />
-              </IconButton>
-            </ProfileModal>
-
-            <UpdateGroupModal>
-              <IconButton display={selectedChat.isGroupChat ? "flex" : "none"}>
-                <ViewIcon />
-              </IconButton>
-            </UpdateGroupModal>
+            <>
+              {selectedChat.isGroupChat ? (
+                <UpdateGroupModal>
+                  <IconButton>
+                    <ViewIcon />
+                  </IconButton>
+                </UpdateGroupModal>
+              ) : (
+                <ProfileModal user={getSenderDetails(user, selectedChat.users)}>
+                  <IconButton>
+                    <ViewIcon />
+                  </IconButton>
+                </ProfileModal>
+              )}
+            </>
           </Box>
           <Box
             // border="1px solid blue"

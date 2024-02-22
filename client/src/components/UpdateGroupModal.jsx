@@ -31,7 +31,7 @@ const BASEURL = process.env.REACT_APP_BASE_URL;
 function UpdateGroupModal({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [groupChatName, setGroupChatName] = useState();
+  const [groupChatName, setGroupChatName] = useState("");
   const [search, setSearch] = useState();
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -120,8 +120,6 @@ function UpdateGroupModal({ children }) {
       });
     }
   };
-
-  // const handleAddUser = (newUser) => {};
 
   const handleAddUser = async (newuser) => {
     if (selectedChat.users.some((user) => user._id === newuser._id)) {

@@ -34,7 +34,7 @@ import {
   selectedChatFun,
   setNotification,
 } from "../redux/chatReducer/action";
-import NotificationBadge, { Effect } from "react-notification-badge";
+// import NotificationBadge, { Effect } from "react-notification-badge";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
@@ -172,10 +172,10 @@ function SearchSection() {
         <Box>
           <Menu>
             <MenuButton bg="transparent">
-              <NotificationBadge
+              {/* <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
-              />
+              /> */}
               <BellIcon boxSize={5} />
             </MenuButton>
             <MenuList p="2">

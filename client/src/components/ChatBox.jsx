@@ -6,7 +6,7 @@ import SingleChat from "./SingleChat";
 function ChatBox() {
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
 
-  console.log(selectedChat, "selectedChat in ChatBox");
+  // console.log(selectedChat, "selectedChat in ChatBox");
 
   return (
     <Box

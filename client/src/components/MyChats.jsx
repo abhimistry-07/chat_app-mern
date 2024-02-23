@@ -55,7 +55,7 @@ function MyChats() {
     fetchChats();
   }, [fetchAgain]);
 
-  console.log(selectedChat, "selectedChat in My Chat comp");
+  // console.log(selectedChat, "selectedChat in My Chat comp");
 
   return (
     <Box

@@ -1,13 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchChatAgainFun,
   selectedChatFun,
 } from "../redux/chatReducer/action";
-import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
-import { ArrowBackIcon, HamburgerIcon, ViewIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
+import { ArrowBackIcon,  ViewIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
 import UpdateGroupModal from "./UpdateGroupModal";
+import { useState } from "react";
+import { DotLoader } from "react-spinners";
+import axios from "axios";
+import styled from "styled-components";
+import DisplayChat from "./DisplayChat";
+
+const BASEURL = process.env.REACT_APP_BASE_URL;
 
 function SingleChat() {
   const user = useSelector((store) => store.authReducer.user);
@@ -15,10 +31,15 @@ function SingleChat() {
   const allChats = useSelector((store) => store.chatReducer.allChat);
   const fetchAgain = useSelector((store) => store.chatReducer.fetchAgain);
 
-  console.log(selectedChat, "selectedChat in singlechat page");
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+
+  // console.log(selectedChat, "selectedChat in singlechat page");
   // fetchChatAgainFun
 
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const getSenderName = (loggedUser, users) => {
     return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
@@ -27,6 +48,85 @@ function SingleChat() {
   const getSenderDetails = (loggedUser, users) => {
     return users[0]?._id === loggedUser?._id ? users[1] : users[0];
   };
+
+  const sendMessage = async (e) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      setNewMessage("");
+
+      const { data } = await axios.post(
+        `${BASEURL}/message`,
+        { content: newMessage, chatId: selectedChat._id },
+        config
+      );
+
+      console.log(data, ">>>>>>..");
+      setMessages([...messages, data]);
+    } catch (error) {
+      toast({
+        title: "Error sending message!",
+        description: error.response?.data,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && newMessage) {
+      sendMessage();
+    }
+  };
+
+  const handleMsgInput = (e) => {
+    setNewMessage(e.target.value);
+  };
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      setLoading(true);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.get(
+        `${BASEURL}/message/${selectedChat._id}`,
+        config
+      );
+
+      setMessages(data);
+      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Error fetching message!",
+        description: error?.response?.data,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
+  // console.log(messages, "messages in singlechat");
 
   return (
     <>
@@ -61,7 +161,7 @@ function SingleChat() {
 
             <>
               {selectedChat.isGroupChat ? (
-                <UpdateGroupModal>
+                <UpdateGroupModal fetchMessages={fetchMessages}>
                   <IconButton>
                     <ViewIcon />
                   </IconButton>
@@ -84,9 +184,46 @@ function SingleChat() {
             display="flex"
             flexDir="column"
             p="3"
-            overflow="hidden"
+            overflowY="hidden"
             bg="#E2E2F6"
-          ></Box>
+            justifyContent="flex-end"
+          >
+            {loading ? (
+              <Box
+                w="100%"
+                h="100%"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <DotLoader size="180px" color="#6468f6" />
+              </Box>
+            ) : (
+              <Box
+                display="flex"
+                flexDir="column"
+                overflowY="scroll"
+                style={{ scrollbarWidth: "none" }}
+              >
+                <DisplayChat messages={messages} />
+              </Box>
+            )}
+            <FormControl
+              onKeyDown={handleKeyPress}
+              display="flex"
+              gap="2"
+              mt="2"
+            >
+              <Input
+                w="100%"
+                bg="white"
+                border="1ps solid gray"
+                onChange={handleMsgInput}
+                value={newMessage}
+              />
+              <Button onClick={sendMessage}>Send</Button>
+            </FormControl>
+          </Box>
         </>
       ) : (
         <Box
@@ -107,3 +244,5 @@ function SingleChat() {
 }
 
 export default SingleChat;
+
+const MESSAGES = styled.div``;

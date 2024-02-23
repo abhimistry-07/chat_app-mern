@@ -14,7 +14,7 @@ function ChatPage() {
   return (
     <Box w="100%">
       {user && <SearchSection />}
-      <Flex justifyContent="space-between" h="100vh" p="10px" gap="2">
+      <Flex justifyContent="space-between" h="92.3vh" p="10px" gap="2">
         {user && <MyChats />}
         {user && <ChatBox />}
       </Flex>

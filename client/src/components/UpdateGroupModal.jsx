@@ -28,7 +28,7 @@ import UserList from "./UserList";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
-function UpdateGroupModal({ children }) {
+function UpdateGroupModal({ children, fetchMessages }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [groupChatName, setGroupChatName] = useState("");
@@ -122,9 +122,9 @@ function UpdateGroupModal({ children }) {
   };
 
   const handleAddUser = async (newuser) => {
-    if (selectedChat.users.some((user) => user._id === newuser._id)) {
+    if (selectedChat.groupAdmin._id !== user._id) {
       toast({
-        title: "User already exists!",
+        title: "Only admin can add new member!",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -133,9 +133,9 @@ function UpdateGroupModal({ children }) {
       return;
     }
 
-    if (selectedChat.groupAdmin._id !== user._id) {
+    if (selectedChat.users.some((user) => user._id === newuser._id)) {
       toast({
-        title: "Only admin can add new member!",
+        title: "User already exists!",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -184,7 +184,7 @@ function UpdateGroupModal({ children }) {
       deleteUser._id !== user._id
     ) {
       toast({
-        title: "Only admin can add new member!",
+        title: "Only admin can remove member!",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -215,6 +215,7 @@ function UpdateGroupModal({ children }) {
         : dispatch(selectedChatFun(data));
 
       dispatch(fetchChatAgainFun(!fetchAgain));
+      fetchMessages();
       setLoading(false);
     } catch (error) {
       toast({
@@ -225,6 +226,7 @@ function UpdateGroupModal({ children }) {
         isClosable: true,
         position: "bottom",
       });
+      setLoading(false);
     }
   };
 

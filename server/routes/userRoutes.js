@@ -37,7 +37,19 @@ userRoute.post('/register', async (req, res) => {
             password: newPass
         });
 
-        res.status(200).send({ 'msg': 'New user has been registered.', user });
+        const token = generateToken(user._id);
+        // // console.log(token);
+        return res.status(200).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            // password: newPass,
+            pic: user.pic,
+            token
+        })
+
+        // res.status(200).send({ 'msg': 'New user has been registered.', user });
     } catch (error) {
         res.status(400).send(error);
     }
@@ -84,9 +96,9 @@ userRoute.get('/allUsers', authenticate, async (req, res) => {
     } : {};
 
     const users = await userModel.find(keyWord)
-    .find({
-        _id: { $ne: req.user._id }
-    });
+        .find({
+            _id: { $ne: req.user._id }
+        });
 
     res.status(200).send(users);
     // console.log(keyWord);

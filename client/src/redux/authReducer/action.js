@@ -1,6 +1,4 @@
-import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_SUCCESS } from "../actionTypes"
-import axios from 'axios';
-const URL = process.env.REACT_APP_BASE_URL;
+import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from "../actionTypes"
 
 export const login = (user) => ({
     type: LOGIN_SUCCESS,

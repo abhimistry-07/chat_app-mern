@@ -8,7 +8,6 @@ import {
   Box,
   Button,
   FormControl,
-  IconButton,
   Input,
   Modal,
   ModalBody,
@@ -21,7 +20,6 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { ViewIcon } from "@chakra-ui/icons";
 import SelectedUsers from "./SelectedUsers";
 import axios from "axios";
 import UserList from "./UserList";
@@ -43,7 +41,7 @@ function UpdateGroupModal({ children, fetchMessages }) {
   const fetchAgain = useSelector((store) => store.chatReducer.fetchAgain);
   const user = useSelector((store) => store.authReducer.user);
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
-  const allChats = useSelector((store) => store.chatReducer.allChat);
+  // const allChats = useSelector((store) => store.chatReducer.allChat);
 
   const handleRename = async () => {
     if (!groupChatName) {
@@ -133,7 +131,7 @@ function UpdateGroupModal({ children, fetchMessages }) {
       return;
     }
 
-    if (selectedChat.users.some((user) => user._id === newuser._id)) {
+    if (selectedChat.users.find((user) => user._id === newuser._id)) {
       toast({
         title: "User already exists!",
         status: "warning",

@@ -4,42 +4,43 @@ import {
   Heading,
   Input,
   Button,
-  FormControl,
-  FormLabel,
-  Switch,
-  useColorMode,
-  useColorModeValue,
+  // FormControl,
+  // FormLabel,
+  // Switch,
+  // useColorMode,
+  // useColorModeValue,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { login, logout } from "../redux/authReducer/action";
+import { login } from "../redux/authReducer/action";
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState([]);
+  // const [userData, setUserData] = useState([]);
 
   const navigate = useNavigate();
-  const { toggleColorMode } = useColorMode();
-  const formBackground = useColorModeValue("gray.100", "gray.700");
+  // const { toggleColorMode } = useColorMode();
+  // const formBackground = useColorModeValue("gray.100", "gray.700");
   const toast = useToast();
 
   const dispatch = useDispatch();
-  const auth = useSelector((store) => store.authReducer.isAuth);
-  const user = useSelector((store) => store.authReducer.user);
+  // const auth = useSelector((store) => store.authReducer.isAuth);
+  // const user = useSelector((store) => store.authReducer.user);
 
   const location = useLocation();
   const isLogedIn = JSON.parse(localStorage.getItem("userInfo"));
+
   if (isLogedIn) {
     return <Navigate state={location.pathname} to={"/chats"} replace={true} />;
   }
 
-  console.log(auth, user, ">>>>>>>>/////////");
+  // console.log(auth, user, ">>>>>>>>/////////");
 
   // const handleLogOut = () => {
   //   localStorage.removeItem("userInfo");
@@ -62,53 +63,55 @@ function Login() {
       return;
     }
 
-    await axios
-      .post(`${BASEURL}/user/login`, {
-        email,
-        password,
-      })
-      .then((res) => {
-        // console.log(res.data, ">>>>>>");
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
 
-        const userData = {
+      const { data } = await axios.post(
+        `${BASEURL}/user/login`,
+        {
           email,
           password,
-        };
+        },
+        config
+      );
+      // console.log(res.data, ">>>>>>");
 
-        dispatch(login(res.data));
-
-        toast({
-          title: "Login Successfull!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-
-        localStorage.setItem("userInfo", JSON.stringify(res.data));
-        setLoading(false);
-        navigate("/chats");
-      })
-      .catch((error) => {
-        // console.log(error?.response.data.msg, ">>>>>>>");
-        toast({
-          title: error?.response?.data?.msg,
-          status: "info",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        console.log(error, "Error login in handleLogin fun");
-        setLoading(false);
+      toast({
+        title: "Login Successfull!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
       });
+
+      dispatch(login(data));
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+    } catch (error) {
+      // console.log(error?.response.data.msg, ">>>>>>>");
+      toast({
+        title: error?.response?.data?.msg,
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      console.log(error, "Error login in handleLogin fun");
+      setLoading(false);
+    }
   };
 
   return (
-    <Flex h="100vh" alignItems="center" justifyContent="center">
+    <Flex h="100vh" alignItems="center" justifyContent="center" bg="#E1E2F6">
       {/* <Button onClick={handleLogOut}>Log Out</Button> */}
       <Flex
         flexDirection="column"
-        // bg={formBackground}
+        bg="white"
         p={12}
         borderRadius={8}
         boxShadow="lg"

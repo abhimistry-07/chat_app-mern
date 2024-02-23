@@ -8,11 +8,9 @@ import {
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   IconButton,
   Input,
-  Spinner,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -22,9 +20,7 @@ import UpdateGroupModal from "./UpdateGroupModal";
 import { useState } from "react";
 import { DotLoader, PulseLoader } from "react-spinners";
 import axios from "axios";
-import styled from "styled-components";
 import DisplayChat from "./DisplayChat";
-import { io } from "socket.io-client";
 import { socket } from "../socket";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
@@ -37,7 +33,7 @@ var selectedChatCompare;
 function SingleChat() {
   const user = useSelector((store) => store.authReducer.user);
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
-  const allChats = useSelector((store) => store.chatReducer.allChat);
+  // const allChats = useSelector((store) => store.chatReducer.allChat);
   const fetchAgain = useSelector((store) => store.chatReducer.fetchAgain);
   const notification = useSelector((store) => store.chatReducer.notification);
 
@@ -50,9 +46,8 @@ function SingleChat() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   // console.log(selectedChat, "selectedChat in singlechat page");
-  // fetchChatAgainFun
 
-  console.log(notification, "notification");
+  // console.log(notification, "notification");
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -328,5 +323,3 @@ function SingleChat() {
 }
 
 export default SingleChat;
-
-const MESSAGES = styled.div``;

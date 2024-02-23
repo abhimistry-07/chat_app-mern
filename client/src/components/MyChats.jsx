@@ -31,6 +31,7 @@ function MyChats() {
       const { data } = await axios.get(`${BASEURL}/chat`, config);
 
       console.log(data, "Allchats");
+
       dispatch(getAllChat(data));
     } catch (error) {
       toast({
@@ -45,10 +46,10 @@ function MyChats() {
   };
 
   const getSender = (loggedUser, users) => {
-    return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
+    return users[0]?._id === loggedUser?._id ? users[1]?.name : users[0]?.name;
   };
 
-  const handleSelectChat = (chat) => {};
+  // const handleSelectChat = (chat) => {};
 
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));

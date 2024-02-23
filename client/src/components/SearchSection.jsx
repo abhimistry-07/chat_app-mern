@@ -13,12 +13,10 @@ import {
   Input,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   MenuList,
   Spinner,
   Text,
-  Tooltip,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -50,7 +48,7 @@ function SearchSection() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((store) => store.authReducer.user);
-  const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
+  // const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
   const allChats = useSelector((store) => store.chatReducer.allChat);
   const notification = useSelector((store) => store.chatReducer.notification);
 

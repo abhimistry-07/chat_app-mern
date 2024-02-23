@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Flex,
   Heading,
@@ -6,9 +6,8 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Switch,
-  useColorMode,
-  useColorModeValue,
+  // useColorMode,
+  // useColorModeValue,
   Text,
   VStack,
   useToast,
@@ -22,16 +21,24 @@ const BASEURL = process.env.REACT_APP_BASE_URL;
 
 function SignUp() {
   const navigate = useNavigate();
-  const { toggleColorMode } = useColorMode();
-  const formBackground = useColorModeValue("gray.100", "gray.700");
+  // const { toggleColorMode } = useColorMode();
+  // const formBackground = useColorModeValue("gray.100", "gray.700");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pic, setPic] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState("");
   const toast = useToast();
+  const fileInput = useRef();
 
   // POST https://api.cloudinary.com/v1_1/dk2sqquxl/image/upload
+
+  const hasDigit = /\d/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasSpecialChar = /[@$!%*?&]/.test(password);
+  const isLongEnough = password.length >= 8;
 
   const postDetails = (pics) => {
     setLoading(true);
@@ -93,12 +100,22 @@ function SignUp() {
     }
 
     try {
-      await axios.post(`${BASEURL}/user/register`, {
-        name,
-        email,
-        password,
-        pic,
-      });
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        `${BASEURL}/user/register`,
+        {
+          name,
+          email,
+          password,
+          pic,
+        },
+        config
+      );
 
       // console.log(data,'>>>>>>>>.');
 
@@ -110,16 +127,13 @@ function SignUp() {
         position: "bottom",
       });
 
-      localStorage.setItem(
-        "userInfo",
-        JSON.stringify({ name, email, password, pic })
-      );
+      localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
       navigate("/chats");
     } catch (error) {
       toast({
-        // title: "Error Occured!",
-        title: error?.response?.data?.msg,
+        title: "Error Occured!",
+        description: error?.response?.data?.msg,
         status: "info",
         duration: 5000,
         isClosable: true,
@@ -130,17 +144,27 @@ function SignUp() {
     }
   };
 
+  const handleFileUpload = (e) => {
+    setFileName(e?.target?.files[0]?.name);
+    postDetails(e.target.files[0]);
+  };
+
   return (
-    <Flex height="100vh" alignItems="center" justifyContent="center">
+    <Flex
+      height="100vh"
+      alignItems="center"
+      justifyContent="center"
+      bg="#E1E2F6"
+    >
       <Flex
         flexDirection="column"
-        // bg={formBackground}
-        p={10}
+        bg="white"
+        p={5}
         w={["100%", "60%", "50%", "30%"]}
         borderRadius={8}
         boxShadow="lg"
       >
-        <Heading mb={6}>Sign Up</Heading>
+        <Heading mb={4}>Sign Up</Heading>
         <VStack>
           <FormControl isRequired>
             <FormLabel>Name</FormLabel>
@@ -148,7 +172,8 @@ function SignUp() {
               type="text"
               placeholder="Enter your name"
               variant="filled"
-              mb={3}
+              // mb={2}
+              value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </FormControl>
@@ -158,7 +183,8 @@ function SignUp() {
               type="email"
               placeholder="Enter your email"
               variant="filled"
-              mb={3}
+              // mb={3}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
@@ -168,7 +194,8 @@ function SignUp() {
               type="password"
               placeholder="Enter your password"
               variant="filled"
-              mb={3}
+              // mb={3}
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </FormControl>
@@ -176,17 +203,26 @@ function SignUp() {
             <FormLabel>Select profile picture</FormLabel>
             <Input
               type="file"
+              ref={fileInput}
               placeholder="Select profile picture"
               variant="filled"
-              mb={4}
+              mb={3}
               accept="image/*"
-              onChange={(e) => postDetails(e.target.files[0])}
+              // onChange={(e) => postDetails(e.target.files[0])}
+              onChange={handleFileUpload}
               // p="1.5"
+              hidden
             />
+            <Flex gap="4" alignItems="center">
+              <Button onClick={() => fileInput.current.click()}>
+                Choose File
+              </Button>
+              {fileName && <Text>{fileName}</Text>}
+            </Flex>
           </FormControl>
           <Button
             colorScheme="teal"
-            mb={0}
+            mb={1}
             w={"100%"}
             onClick={handleFormSubmit}
             isLoading={loading}
@@ -194,6 +230,43 @@ function SignUp() {
             Sign Up
           </Button>
         </VStack>
+        <>
+          <p style={{ color: hasDigit ? "green" : "red", fontSize: "14px" }}>
+            Contains a digit
+          </p>
+          <p
+            style={{
+              color: hasLowercase ? "green" : "red",
+              fontSize: "14px",
+            }}
+          >
+            Contains a lowercase letter
+          </p>
+          <p
+            style={{
+              color: hasUppercase ? "green" : "red",
+              fontSize: "14px",
+            }}
+          >
+            Contains an uppercase letter
+          </p>
+          <p
+            style={{
+              color: hasSpecialChar ? "green" : "red",
+              fontSize: "14px",
+            }}
+          >
+            Contains a special character
+          </p>
+          <p
+            style={{
+              color: isLongEnough ? "green" : "red",
+              fontSize: "14px",
+            }}
+          >
+            At least 8 characters required
+          </p>
+        </>
         {/* <FormControl isRequired> */}
         {/* </FormControl> */}
 
@@ -210,7 +283,7 @@ function SignUp() {
         </FormControl> */}
         <Text
           textAlign={"right"}
-          mt={5}
+          mt={4}
           _hover={{
             cursor: "pointer",
             fontWeight: "bold",

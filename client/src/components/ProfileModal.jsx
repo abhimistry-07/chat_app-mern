@@ -11,7 +11,7 @@ import {
   Button,
   Avatar,
   Text,
-  Flex,
+  // Flex,
   Box,
 } from "@chakra-ui/react";
 
@@ -55,8 +55,6 @@ function ProfileModal({ user, children }) {
       </Modal>
     </>
   );
-
-  return <div>ProfileModal</div>;
 }
 
 export default ProfileModal;

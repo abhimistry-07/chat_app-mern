@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllChat } from "../redux/chatReducer/action";
 import axios from "axios";
 import UserList from "./UserList";
-import { CloseIcon } from "@chakra-ui/icons";
+// import { CloseIcon } from "@chakra-ui/icons";
 import SelectedUsers from "./SelectedUsers";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
@@ -157,7 +157,7 @@ function CreateGroupModal({ children }) {
     }
   };
 
-  console.log(selectedUsers, groupChatName, ">>>>>>..");
+  // console.log(selectedUsers, groupChatName, ">>>>>>..");
 
   return (
     <>

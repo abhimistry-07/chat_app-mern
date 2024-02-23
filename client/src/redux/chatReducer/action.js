@@ -1,4 +1,4 @@
-import { FETCH_AGAIN, GET_ALL_CHATS, GET_SELECTED_CHAT } from "../actionTypes"
+import { FETCH_AGAIN, GET_ALL_CHATS, GET_NOTIFICATION, GET_SELECTED_CHAT } from "../actionTypes"
 
 export const selectedChatFun = (chat) => ({
     type: GET_SELECTED_CHAT,
@@ -14,3 +14,8 @@ export const fetchChatAgainFun = (chat) => ({
     type: FETCH_AGAIN,
     payload: chat
 });
+
+export const setNotification = (notification) => ({
+    type: GET_NOTIFICATION,
+    payload: notification
+})

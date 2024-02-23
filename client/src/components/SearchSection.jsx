@@ -31,7 +31,12 @@ import ProfileModal from "./ProfileModal";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserList from "./UserList";
-import { getAllChat, selectedChatFun } from "../redux/chatReducer/action";
+import {
+  getAllChat,
+  selectedChatFun,
+  setNotification,
+} from "../redux/chatReducer/action";
+import NotificationBadge, { Effect } from "react-notification-badge";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
 
@@ -47,6 +52,7 @@ function SearchSection() {
   const user = useSelector((store) => store.authReducer.user);
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
   const allChats = useSelector((store) => store.chatReducer.allChat);
+  const notification = useSelector((store) => store.chatReducer.notification);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -136,6 +142,10 @@ function SearchSection() {
     }
   };
 
+  const getSender = (loggedUser, users) => {
+    return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
+  };
+
   // console.log(searchResult, ">>>.");
 
   return (
@@ -164,8 +174,32 @@ function SearchSection() {
         <Box>
           <Menu>
             <MenuButton bg="transparent">
+              <NotificationBadge
+                count={notification.length}
+                effect={Effect.SCALE}
+              />
               <BellIcon boxSize={5} />
             </MenuButton>
+            <MenuList p="2">
+              {!notification.length && "No new Messages"}
+
+              {notification &&
+                notification.map((not) => (
+                  <MenuItem
+                    key={not._id}
+                    onClick={() => {
+                      dispatch(selectedChatFun(not.chat));
+                      dispatch(
+                        setNotification(notification.filter((n) => n !== not))
+                      );
+                    }}
+                  >
+                    {not.chat.isGroupChat
+                      ? `New message from ${not.chat.chatName}`
+                      : `New message from ${getSender(user, not.chat.users)}`}
+                  </MenuItem>
+                ))}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton

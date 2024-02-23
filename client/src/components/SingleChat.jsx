@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectedChatFun } from "../redux/chatReducer/action";
+import {
+  fetchChatAgainFun,
+  selectedChatFun,
+  setNotification,
+} from "../redux/chatReducer/action";
 import {
   Box,
   Button,
@@ -35,6 +39,7 @@ function SingleChat() {
   const selectedChat = useSelector((store) => store.chatReducer.selectedChat);
   const allChats = useSelector((store) => store.chatReducer.allChat);
   const fetchAgain = useSelector((store) => store.chatReducer.fetchAgain);
+  const notification = useSelector((store) => store.chatReducer.notification);
 
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,6 +51,8 @@ function SingleChat() {
 
   // console.log(selectedChat, "selectedChat in singlechat page");
   // fetchChatAgainFun
+
+  console.log(notification, "notification");
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -166,6 +173,10 @@ function SingleChat() {
   useEffect(() => {
     fetchMessages();
 
+    // if (selectedChat) {
+    //   dispatch(setNotification([]));
+    // }
+
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
@@ -175,6 +186,10 @@ function SingleChat() {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessage.chat._id
       ) {
+        if (!notification.includes(newMessage)) {
+          dispatch(setNotification([newMessage, ...notification]));
+          dispatch(fetchChatAgainFun(!fetchAgain));
+        }
       } else {
         setMessages([...messages, newMessage]);
       }

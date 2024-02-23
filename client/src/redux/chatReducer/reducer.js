@@ -1,9 +1,10 @@
-import { FETCH_AGAIN, GET_ALL_CHATS, GET_SELECTED_CHAT } from "../actionTypes";
+import { FETCH_AGAIN, GET_ALL_CHATS, GET_NOTIFICATION, GET_SELECTED_CHAT } from "../actionTypes";
 
 const initState = {
     selectedChat: null,
     allChat: [],
-    fetchAgain: false
+    fetchAgain: false,
+    notification: []
 }
 
 export const reducer = (state = initState, action) => {
@@ -22,6 +23,11 @@ export const reducer = (state = initState, action) => {
             return {
                 ...state,
                 fetchAgain: action.payloads
+            }
+        case GET_NOTIFICATION:
+            return {
+                ...state,
+                notification: action.payload
             }
         default:
             return state;

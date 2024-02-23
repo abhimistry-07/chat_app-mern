@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectedChatFun,
-} from "../redux/chatReducer/action";
+import { selectedChatFun } from "../redux/chatReducer/action";
 import {
   Box,
   Button,
@@ -14,16 +12,23 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { ArrowBackIcon,  ViewIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ViewIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
 import UpdateGroupModal from "./UpdateGroupModal";
 import { useState } from "react";
-import { DotLoader } from "react-spinners";
+import { DotLoader, PulseLoader } from "react-spinners";
 import axios from "axios";
 import styled from "styled-components";
 import DisplayChat from "./DisplayChat";
+import { io } from "socket.io-client";
+import { socket } from "../socket";
 
 const BASEURL = process.env.REACT_APP_BASE_URL;
+
+// const ENDPOINT = "http://localhost:8080";
+
+// const socket = io(BASEURL);
+var selectedChatCompare;
 
 function SingleChat() {
   const user = useSelector((store) => store.authReducer.user);
@@ -34,6 +39,10 @@ function SingleChat() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const [socketConnected, setSocketConnected] = useState(false);
 
   // console.log(selectedChat, "selectedChat in singlechat page");
   // fetchChatAgainFun
@@ -50,6 +59,7 @@ function SingleChat() {
   };
 
   const sendMessage = async (e) => {
+    socket.emit("stop typing", selectedChat._id);
     try {
       const config = {
         headers: {
@@ -65,7 +75,8 @@ function SingleChat() {
         config
       );
 
-      console.log(data, ">>>>>>..");
+      // console.log(data, ">>>>>>..");
+      socket.emit("new message", data);
       setMessages([...messages, data]);
     } catch (error) {
       toast({
@@ -88,6 +99,25 @@ function SingleChat() {
 
   const handleMsgInput = (e) => {
     setNewMessage(e.target.value);
+
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    let timerLength = 3000;
+
+    setTimeout(() => {
+      let timeNow = new Date().getTime();
+      let timeDiff = timeNow - lastTypingTime;
+
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
   };
 
   const fetchMessages = async () => {
@@ -109,6 +139,7 @@ function SingleChat() {
 
       setMessages(data);
       setLoading(false);
+      socket.emit("join chat", selectedChat._id);
     } catch (error) {
       toast({
         title: "Error fetching message!",
@@ -123,8 +154,38 @@ function SingleChat() {
   };
 
   useEffect(() => {
+    // when user logins
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
+    // socket = io(BASEURL);
+  }, []);
+
+  useEffect(() => {
     fetchMessages();
+
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message received", (newMessage) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessage.chat._id
+      ) {
+      } else {
+        setMessages([...messages, newMessage]);
+      }
+    });
+  });
+
+  // useEffect(() => {
+  //   return () => {
+  //     socket.off();
+  //   };
+  // }, []);
 
   // console.log(messages, "messages in singlechat");
 
@@ -208,6 +269,14 @@ function SingleChat() {
                 <DisplayChat messages={messages} />
               </Box>
             )}
+            {isTyping ? (
+              <div style={{ marginTop: "10px" }}>
+                <PulseLoader color="#ffffff" />
+              </div>
+            ) : (
+              ""
+            )}
+
             <FormControl
               onKeyDown={handleKeyPress}
               display="flex"

@@ -66,7 +66,8 @@ function DisplayChat({ messages }) {
             <Text
               bg={`${message.sender._id === user._id ? "#6468f6" : "#ffffff"}`}
               color={`${message.sender._id === user._id ? "#ffffff" : "black"}`}
-              borderRadius="lg"
+              // borderRadius="lg"
+              borderRadius="5px 20px "
               px="4"
               py="2"
               maxW="75%"
